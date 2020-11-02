@@ -1,6 +1,4 @@
 #include "pch.h"
-#include <Windows.h>
-#include <iostream>
 
 void brb::cls()
 {

@@ -1,4 +1,5 @@
 #include "pch.h"
+
 namespace brb {
 	FILE* stream = nullptr;
 }

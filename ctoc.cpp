@@ -1,5 +1,4 @@
 #include "pch.h"
-#include <Windows.h>
 
 void brb::ctoc(const std::wstring& text)
 {
