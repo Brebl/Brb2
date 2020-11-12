@@ -1,3 +1,7 @@
+//-------------------------------------------------------------------------------------------------
+//function:		put this at the end of main() and log.txt gets removed if no errors happened during excecution
+//-------------------------------------------------------------------------------------------------
+
 #include "pch.h"
 
 namespace brb {
