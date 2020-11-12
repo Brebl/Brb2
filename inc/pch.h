@@ -9,6 +9,11 @@
 
 // add headers that you want to pre-compile here
 #include "framework.h"
-#include <brb2.h>
-
+#include <string>
+#include <ctime>
+#include <iostream>
+#include <fstream>
+#include <Windows.h>
+#include <climits>
+#include "brb2.h"
 #endif //PCH_H
