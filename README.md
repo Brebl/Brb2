@@ -3,4 +3,4 @@ General templates
 
 Logging and some console functions.
 
-vcxproj builds dynamic-link library for x86 and x64.
+vcxproj builds dynamic-link library (.dll) for x86 and x64.
