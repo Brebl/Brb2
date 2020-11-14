@@ -23,6 +23,6 @@ void brb::redirect(const char* filename)
 		fprintf(stdout, "error on freopen: %i\n", err);
 	}
 	else {
-		fprintf(stdout, "stderr stream redirected to: %s\n", filename);
+		fprintf(stdout, "logs and error messages redirected to: %s\n", filename);
 	}
 }
