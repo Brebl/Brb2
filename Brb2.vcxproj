@@ -96,11 +96,13 @@
     <TargetExt>.dll</TargetExt>
     <OutDir>bin\windows\$(platformshortname)\$(Configuration)\</OutDir>
     <IntDir>obj\windows\$(platformshortname)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(Platformshortname)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>bin\windows\$(platformshortname)\$(Configuration)\</OutDir>
     <IntDir>obj\windows\$(platformshortname)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(Platformshortname)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -108,11 +110,13 @@
     <TargetExt>.dll</TargetExt>
     <OutDir>bin\windows\$(platformshortname)\$(Configuration)\</OutDir>
     <IntDir>obj\windows\$(platformshortname)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(Platformshortname)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>bin\windows\$(platformshortname)\$(Configuration)\</OutDir>
     <IntDir>obj\windows\$(platformshortname)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(Platformshortname)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
