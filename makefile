@@ -14,16 +14,18 @@ SHELL = /bin/sh
 
 CXX 			:= g++
 LD				:= ld
-PROG_NAME 		:= program
 OS				:= linux
 ARCH			:= x86
-DEBUGFLAGS 		= -g $(DEFS) $(INC)
-RELEASEFLAGS 	= -O $(DEFS) $(INC)
+PROG_NAME 		= brb2_$(ARCH).so
+DEBUGFLAGS 		= -g -Wall -fpic $(DEFS) $(INC)
+RELEASEFLAGS 	= -O -fpic $(DEFS) $(INC)
+LDFLAGS			= -shared
 DEFS			= -std=c++17 -D BRB2_EXPORTS
 INC				= -iquote $(incdir)
 
 prefix 			= /usr/local/
 bindir 			= $(prefix)bin/
+libdir			= $(prefix)lib/$(basename $(PROG_NAME))/
 infodir 		= $(prefix)info/
 
 ##########################
@@ -34,12 +36,15 @@ incdir			= ./inc/
 src_basedir		= ./src
 srcdirs			= $(addsuffix /,$(shell find $(src_basedir) -type d))
 resdir			= ./res/
-libdir			= ./lib/$(OS)/$(ARCH)/
+3libdir			= ./lib/$(OS)/$(ARCH)/
 depdir			= ./dep/$(OS)/$(ARCH)/
 d_objdir		= ./obj/$(OS)/$(ARCH)/debug/
 r_objdir		= ./obj/$(OS)/$(ARCH)/release/
 
-mkdirs			:= $(debugdir) $(d_objdir) $(depdir)
+d_dirs			:= $(debugdir) $(d_objdir)
+r_dirs			:= $(r_objdir) $(libdir)
+all_dirs		:= $(debugdir) $(incdir) $(src_basedir) $(resdir) \
+					$(3libdir) $(depdir) $(d_objdir) $(r_objdir)
 
 vpath %.h		$(incdir)
 vpath %.cpp		$(srcdirs)
@@ -63,30 +68,30 @@ DEPENDENCY 		:= $(addprefix $(depdir),$(SRCS:.cpp=.dep))
 
 ####################
 
-.PHONY: all debug release clean
+.PHONY: all debug release installdirs clean
 
 all: debug
 
 debug: $(DEBUG_OBJS)
 	@echo [LINK] 
-	$(CXX) $(DEBUGFLAGS) $^ -o $(debugdir)$(PROG_NAME)
+	$(CXX) $(LDFLAGS) $^ -o $(debugdir)$(PROG_NAME)
 
-$(d_objdir)%.o : %.cpp %.dep
+$(d_objdir)%.o : %.cpp %.dep | $(d_dirs)
 	@echo [COMPILE]
 	$(CXX) -c $(DEBUGFLAGS) \
 	-o $@ $<
 
-release: $(RELEASE_OBJS)
+install: $(RELEASE_OBJS)
 	@echo [LINK] 
-	$(CXX) $(RELEASEFLAGS) $^ -o $(bindir)$(PROG_NAME)
+	$(CXX) $(LDFLAGS) $^ -o $(libdir)$(PROG_NAME)
 
-$(r_objdir)%.o : %.cpp %.dep
+$(r_objdir)%.o : %.cpp %.dep | $(r_dirs)
 	@echo [COMPILE]
 	$(CXX) -c $(RELEASEFLAGS) \
 	-o $@ $<
 
 # Dependency generation.
-$(depdir)%.dep : %.cpp | $(mkdirs)
+$(depdir)%.dep : %.cpp | $(depdir)
 	@echo [DEPENDENCY]
 	$(CXX) -c $(DEBUGFLAGS) \
 	-MM -MP -MT $@ $< \
@@ -95,15 +100,22 @@ $(depdir)%.dep : %.cpp | $(mkdirs)
 -include $(DEPENDENCY) 
 #dep/main.dep: src/main.cpp inc/header.h
 
-$(mkdirs):
-	@echo [MKDIRS]
-	mkdir -p $(mkdirs)
+$(depdir):
+	@echo [MKDIR depdir]
+	mkdir -p $(depdir)
+
+$(d_dirs):
+	@echo [MKDIR d_dirs]
+	mkdir -p $(d_dirs)
+
+$(r_dirs):
+	@echo [MKDIR r_dirs]
+	mkdir -p $(r_dirs)
 
 installdirs: 
-	$(srcdirs) \
-	$(bindir) $(datadir) \
-	$(libdir) $(infodir) \
-	$(mandir)
+	@echo [INSTALLDIRS]
+	mkdir -p $(all_dirs)
 
 clean:
-	rm -r bin obj dep
+	rm -f $(bindir)$(PROG_NAME)
+	rm -f $(debugdir)* $(d_objdir)* $(r_objdir)* $(libdir)* $(depdir)*
