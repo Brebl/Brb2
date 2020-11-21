@@ -6,5 +6,5 @@ Logging and some console functions.
 vcxproj builds dynamic-link library (.dll) for x86 and x64.
 makefile builds shared-object (.so) for linux
 
-windows version ready
+windows version ready 
 linux version NOT ready
