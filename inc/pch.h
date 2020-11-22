@@ -13,7 +13,15 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
-#include <Windows.h>
 #include <climits>
 #include "brb2.h"
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif  //WIN32
+
+#ifdef __linux__
+//#error precompiled file not used
+
+#endif  //linux
 #endif //PCH_H

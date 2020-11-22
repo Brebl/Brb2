@@ -15,13 +15,14 @@ SHELL = /bin/sh
 CXX 			:= g++
 LD				:= ld
 OS				:= linux
-ARCH			:= x86
+ARCH			:= x64
 PROG_NAME 		= brb2_$(ARCH).so
-DEBUGFLAGS 		= -g -Wall -fpic $(DEFS) $(INC)
-RELEASEFLAGS	= -O -fpic $(DEFS) $(INC)
+DEBUGFLAGS 		= -g -Wall $(DEFS) $(INC)
+RELEASEFLAGS	= -O $(DEFS) $(INC) 
+DEFS			= -std=c++17 -march=x86-64 -fpic
+INC				= -iquote $(incdir) \
+					-I /usr/include/x86_64-linux-gnu/qt5/
 LDFLAGS			= -shared
-DEFS			= -std=c++17 -D BRB2_EXPORTS
-INC				= -iquote $(incdir)
 
 prefix 			= /usr/local/
 bindir 			= $(prefix)bin/
@@ -80,8 +81,8 @@ install: $(GCH) release
 # GNU specific precompiled header:
 $(GCH): $(PCH)
 	@echo [PRECOMPILED HEADER]
-#	$(CXX) -c $(DEBUGFLAGS) $<
-	$(CXX) -c $(RELEASEFLAGS) $<
+	$(CXX) -c $(DEBUGFLAGS) $<
+#	$(CXX) -c $(RELEASEFLAGS) $<
 
 debug: $(DEBUG_OBJS) 
 	@echo [LINK] 

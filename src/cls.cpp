@@ -2,11 +2,11 @@
 // function:	clear console screen
 //-------------------------------------------------------------------------------------------------
 
-
 #include "pch.h"
 
 void brb::cls()
 {
+	#ifdef _WIN32
 	HANDLE                     hStdOut;
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	DWORD                      count;
@@ -53,4 +53,8 @@ void brb::cls()
 
 	/* Move the cursor home */
 	SetConsoleCursorPosition(hStdOut, homeCoords);
+	#endif //win32
+	#ifdef __linux__
+	std::system("clear");
+	#endif //linux
 }

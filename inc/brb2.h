@@ -1,10 +1,18 @@
 #pragma once
+#include "pch.h"
+
+#ifdef _WIN32
 #undef max
 #ifdef BRB2_EXPORTS
 #define BRB2_API __declspec(dllexport)
 #else
 #define BRB2_API __declspec(dllimport)
-#endif
+#endif //brb2_exports
+#endif	//win32
+
+#ifdef __linux__
+#define BRB2_API
+#endif //linux
 
 namespace brb {
 	BRB2_API extern bool sb_err;
