@@ -4,8 +4,8 @@
 
 #include "pch.h"
 #ifdef __linux__
-#include <qt5/QtGui/qclipboard.h>
-#include <qt5/QtGui/qguiapplication.h>
+//#include <qt5/QtGui/qclipboard.h>
+//#include <qt5/QtGui/qguiapplication.h>
 #endif //linux
 
 void brb::ctoc(const std::wstring& text)
@@ -23,7 +23,7 @@ void brb::ctoc(const std::wstring& text)
 	#endif //win32
 	
 	#ifdef __linux__
-	QClipboard *clipboard = QGuiApplication::clipboard();
-	clipboard->setText(QString::fromStdWString(text));
+	//QClipboard *clipboard = QGuiApplication::clipboard();
+	//clipboard->setText(QString::fromStdWString(text));
 	#endif //linux
 }

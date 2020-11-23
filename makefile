@@ -16,12 +16,12 @@ CXX 			:= g++
 LD				:= ld
 OS				:= linux
 ARCH			:= x64
-PROG_NAME 		= brb2_$(ARCH).so
+PROG_NAME 		= libbrb2_$(ARCH).so
 DEBUGFLAGS 		= -g -Wall $(DEFS) $(INC)
 RELEASEFLAGS	= -O $(DEFS) $(INC) 
 DEFS			= -std=c++17 -march=x86-64 -fpic
 INC				= -iquote $(incdir) \
-					-I /usr/include/x86_64-linux-gnu/qt5/
+#					-I /usr/include/x86_64-linux-gnu/qt5/
 LDFLAGS			= -shared
 
 prefix 			= /usr/local/
