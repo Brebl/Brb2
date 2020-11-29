@@ -21,7 +21,7 @@ PROG_NAME 		:= libbrb2.so
 VERSION			:= 0
 MINOR			:= 0.0
 SONAME			:= $(PROG_NAME).$(VERSION)
-REALNAME		:= $(SONAME).$(MINOR)
+FILENAME		:= $(SONAME).$(MINOR)
 CFLAGS	 		= -g -Wall $(DEFS) $(INC)
 DEFS			= -std=c++17 -march=x86-64 -fPIC
 INC				= -iquote $(incdir)
@@ -35,7 +35,7 @@ infodir 		= $(prefix)info/
 ################################
 # Project files
 ################################
-debugdir 		= ./bin/$(OS)/
+builddir 		= ./bin/$(OS)/
 incdir			= ./inc/
 src_basedir		= ./src/
 srcdirs			= $(addsuffix /,$(shell find $(patsubst %/,%,$(src_basedir) -type d)))
@@ -44,8 +44,8 @@ resdir			= ./res/
 depdir			= ./dep/$(OS)/
 objdir			= ./obj/$(OS)/
 
-dirs		= $(debugdir) $(incdir) $(src_basedir) $(resdir) \
-				$(3libdir) $(objdir)
+dirs		= $(builddir) $(incdir) $(src_basedir) $(resdir) \
+				$(3libdir) $(depdir) $(objdir)
 
 SRCS	:= $(patsubst ./%,%,$(foreach dir, $(srcdirs),$(wildcard $(dir)*.cpp)))
 
@@ -90,17 +90,17 @@ build: $(BUILD)
 $(BUILD): $(OBJS)
 	@echo
 	@echo [LINK]
-	$(CXX) $(LDFLAGS) $^ -o $(debugdir)$(REALNAME)
+	$(CXX) $(LDFLAGS) $^ -o $(builddir)$(FILENAME)
 	@touch $@
 
-$(objdir)%.o : %.cpp %.dep | $(dirs)
+$(objdir)%.o : %.cpp %.dep
 	@echo [COMPILE]
 	$(CXX) -c $(CFLAGS) \
 	-o $@ $<
 
 # Dependency generation:
 # dep/main.dep: src/main.cpp inc/header.h
-$(depdir)%.dep : %.cpp | $(depdir)
+$(depdir)%.dep : %.cpp | $(dirs)
 	@echo [DEPENDENCY]
 	$(CXX) -c $(CFLAGS) \
 	-MM -MP -MT $@ $< \
@@ -111,20 +111,20 @@ $(depdir)%.dep : %.cpp | $(depdir)
 install: all
 	@echo
 	@echo [INSTALL]
-	$(INSTALLDATA) $(debugdir)$(REALNAME) $(libdir)$(REALNAME)
+	$(INSTALLDATA) $(builddir)$(FILENAME) $(libdir)$(FILENAME)
 	rm -f $(libdir)$(PROG_NAME)
-	ln -s $(REALNAME) $(libdir)$(PROG_NAME)
+	ln -s $(FILENAME) $(libdir)$(PROG_NAME)
 	ldconfig
 
 clean:
 	@echo [CLEAN]
-ifdef debugdir
-	rm -f $(debugdir)*
+ifdef builddir
+	rm -f $(builddir)*
 endif
 	rm -f $(OBJS) $(DEPENDENCY) $(GCH) $(BUILD)
 
 realclean: clean
-	rm -f $(libdir)$(REALNAME)
+	rm -f $(libdir)$(FILENAME)
 	rm -f $(libdir)$(SONAME)
 	rm -f $(libdir)$(PROG_NAME)
 	ldconfig
@@ -135,18 +135,15 @@ rebuild: clean
 	$(MAKE)
 
 # Directory structure
-$(depdir):
-	@echo
-	@echo [MKDIR depdir]
-	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(depdir)$(dir))
-
 $(dirs):
 	@echo
 	@echo [MKDIR dirs]
 	mkdir -p $(dirs)
 	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(objdir)$(dir))
+	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(depdir)$(dir))
 
 installdirs:
 	@echo [INSTALLDIRS]
 	mkdir -p $(dirs)
+	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(objdir)$(dir))
 	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(depdir)$(dir))
