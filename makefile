@@ -10,44 +10,44 @@
 SHELL = /bin/sh
 
 .SUFFIXES:
-.SUFFIXES: .cpp .o .h
+.SUFFIXES: .cpp .o .h .dep
 
 CXX 			:= g++
 LD				:= ld
+INSTALL			:= install
+INSTALLDATA		:= install -m 644
 OS				:= linux
-ARCH			:= x64
-PROG_NAME 		= libbrb2_$(ARCH).so
-DEBUGFLAGS 		= -g -Wall $(DEFS) $(INC)
-RELEASEFLAGS	= -O $(DEFS) $(INC) 
-DEFS			= -std=c++17 -march=x86-64 -fpic
-INC				= -iquote $(incdir) \
-#					-I /usr/include/x86_64-linux-gnu/qt5/
-LDFLAGS			= -shared
+PROG_NAME 		:= libbrb2.so
+VERSION			:= 0
+MINOR			:= 0.0
+SONAME			:= $(PROG_NAME).$(VERSION)
+REALNAME		:= $(SONAME).$(MINOR)
+CFLAGS	 		= -g -Wall $(DEFS) $(INC)
+DEFS			= -std=c++17 -march=x86-64 -fPIC
+INC				= -iquote $(incdir)
+LDFLAGS			= -shared -Wl,-soname,$(SONAME)
 
 prefix 			= /usr/local/
 bindir 			= $(prefix)bin/
-libdir			= $(prefix)lib/$(basename $(PROG_NAME))/
+libdir			= $(prefix)lib/
 infodir 		= $(prefix)info/
 
 ################################
 # Project files
 ################################
-debugdir 		= ./bin/$(OS)/$(ARCH)/
+debugdir 		= ./bin/$(OS)/
 incdir			= ./inc/
-src_basedir		= ./src
-srcdirs			= $(addsuffix /,$(shell find $(src_basedir) -type d))
+src_basedir		= ./src/
+srcdirs			= $(addsuffix /,$(shell find $(patsubst %/,%,$(src_basedir) -type d)))
 resdir			= ./res/
-3libdir			= ./lib/$(OS)/$(ARCH)/
-depdir			= ./dep/$(OS)/$(ARCH)/
-d_objdir		= ./obj/$(OS)/$(ARCH)/debug/
-r_objdir		= ./obj/$(OS)/$(ARCH)/release/
+3libdir			= ./lib/$(OS)/
+depdir			= ./dep/$(OS)/
+objdir			= ./obj/$(OS)/
 
-d_dirs			= $(debugdir) $(d_objdir)
-r_dirs			= $(r_objdir) $(libdir)
-all_dirs		= $(debugdir) $(incdir) $(src_basedir) $(resdir) \
-					$(3libdir) $(depdir) $(d_objdir) $(r_objdir)
+dirs		= $(debugdir) $(incdir) $(src_basedir) $(resdir) \
+				$(3libdir) $(objdir)
 
-SRCS	:= $(notdir $(foreach dir, $(srcdirs),$(wildcard $(dir)*.cpp)))
+SRCS	:= $(patsubst ./%,%,$(foreach dir, $(srcdirs),$(wildcard $(dir)*.cpp)))
 
 RESS	:= \
 
@@ -59,78 +59,94 @@ PCH		:= $(incdir)pch.h
 # Targets
 ################################
 
-DEBUG_OBJS 		:= $(addprefix $(d_objdir),$(SRCS:.cpp=.o))
-RELEASE_OBJS	:= $(addprefix $(r_objdir),$(SRCS:.cpp=.o))
+OBJS 			:= $(addprefix $(objdir),$(SRCS:.cpp=.o))
 DEPENDENCY 		:= $(addprefix $(depdir),$(SRCS:.cpp=.dep))
 GCH				:= $(PCH).gch
+BUILD			:= $(objdir).lastbuild
 
 vpath %.h		$(incdir)
 vpath %.cpp		$(srcdirs)
 vpath %.dep		$(depdir)
 vpath %.o 		$(objdir)
 
-.PHONY: all install debug release installdirs clean
+.PHONY: all build install clean realclean rebuild installdirs
 
 ################################
 # Make
 ################################
 
-all: $(GCH) debug
-install: $(GCH) release
+all: $(GCH) build
 
-# GNU specific precompiled header:
+# GNU specific precompiled header: 
 $(GCH): $(PCH)
+	@echo
 	@echo [PRECOMPILED HEADER]
-	$(CXX) -c $(DEBUGFLAGS) $<
-#	$(CXX) -c $(RELEASEFLAGS) $<
+	$(CXX) -c $(CFLAGS) $<
 
-debug: $(DEBUG_OBJS) 
-	@echo [LINK] 
-	$(CXX) $(LDFLAGS) $^ -o $(debugdir)$(PROG_NAME)
+build: $(BUILD)
+	@echo
+	@echo [PROJECT UP-TO-DATE]
 
-$(d_objdir)%.o : %.cpp %.dep | $(d_dirs)
+$(BUILD): $(OBJS)
+	@echo
+	@echo [LINK]
+	$(CXX) $(LDFLAGS) $^ -o $(debugdir)$(REALNAME)
+	@touch $@
+
+$(objdir)%.o : %.cpp %.dep | $(dirs)
 	@echo [COMPILE]
-	$(CXX) -c $(DEBUGFLAGS) \
-	-o $@ $<
-
-release: $(RELEASE_OBJS)
-	@echo [LINK] 
-	$(CXX) $(LDFLAGS) $^ -o $(libdir)$(PROG_NAME)
-
-$(r_objdir)%.o : %.cpp %.dep | $(r_dirs)
-	@echo [COMPILE]
-	$(CXX) -c $(RELEASEFLAGS) \
+	$(CXX) -c $(CFLAGS) \
 	-o $@ $<
 
 # Dependency generation:
 # dep/main.dep: src/main.cpp inc/header.h
 $(depdir)%.dep : %.cpp | $(depdir)
 	@echo [DEPENDENCY]
-	$(CXX) -c $(DEBUGFLAGS) \
+	$(CXX) -c $(CFLAGS) \
 	-MM -MP -MT $@ $< \
 	> $@
 
 -include $(DEPENDENCY)
 
-# Directories
-$(depdir):
-	@echo [MKDIR depdir]
-	mkdir -p $(depdir)
-
-$(d_dirs):
-	@echo [MKDIR d_dirs]
-	mkdir -p $(d_dirs)
-
-$(r_dirs):
-	@echo [MKDIR r_dirs]
-	mkdir -p $(r_dirs)
-
-installdirs: 
-	@echo [INSTALLDIRS]
-	mkdir -p $(all_dirs)
+install: all
+	@echo
+	@echo [INSTALL]
+	$(INSTALLDATA) $(debugdir)$(REALNAME) $(libdir)$(REALNAME)
+	rm -f $(libdir)$(PROG_NAME)
+	ln -s $(REALNAME) $(libdir)$(PROG_NAME)
+	ldconfig
 
 clean:
-	rm -f $(bindir)$(PROG_NAME)
-	rm -f $(debugdir)* $(d_objdir)* $(r_objdir)* $(libdir)* $(depdir)*
-	rm -f $(incdir)pch.h.gch
-	
+	@echo [CLEAN]
+ifdef debugdir
+	rm -f $(debugdir)*
+endif
+	rm -f $(OBJS) $(DEPENDENCY) $(GCH) $(BUILD)
+
+realclean: clean
+	rm -f $(libdir)$(REALNAME)
+	rm -f $(libdir)$(SONAME)
+	rm -f $(libdir)$(PROG_NAME)
+	ldconfig
+
+rebuild: clean
+	@echo
+	@echo [REBUILD]
+	$(MAKE)
+
+# Directory structure
+$(depdir):
+	@echo
+	@echo [MKDIR depdir]
+	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(depdir)$(dir))
+
+$(dirs):
+	@echo
+	@echo [MKDIR dirs]
+	mkdir -p $(dirs)
+	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(objdir)$(dir))
+
+installdirs:
+	@echo [INSTALLDIRS]
+	mkdir -p $(dirs)
+	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(depdir)$(dir))
