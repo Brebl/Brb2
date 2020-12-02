@@ -1,6 +1,6 @@
 # Brb2  
   
-General logging templates and some cli functions.  
+General logging templates and cli functions.  
   
 Makefile builds shared-object (.so) for linux.  
 Vcxproj builds dynamic-link library (.dll) for x86 and x64 windows.  
