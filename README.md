@@ -2,8 +2,8 @@
   
 General logging templates and some cli functions.  
   
-makefile builds shared-object (.so) for linux  
-vcxproj builds dynamic-link library (.dll) for x86 and x64 windows  
+Makefile builds shared-object (.so) for linux.  
+Vcxproj builds dynamic-link library (.dll) for x86 and x64 windows.  
   
 ## Building in linux  
 `git clone https://github.com/Brebl/Brb2.git`  
