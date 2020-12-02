@@ -7,21 +7,6 @@
 #ifndef PCH_H
 #define PCH_H
 
-// add headers that you want to pre-compile here
-#include "framework.h"
-#include <string>
-#include <ctime>
-#include <iostream>
-#include <fstream>
-#include <climits>
 #include "brb2.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#endif  //WIN32
-
-#ifdef __linux__
-//#error precompiled file not used
-
-#endif  //linux
 #endif //PCH_H

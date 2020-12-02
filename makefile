@@ -18,10 +18,10 @@ INSTALL			:= install
 INSTALLDATA		:= install -m 644
 OS				:= linux
 PROG_NAME 		:= libbrb2.so
-VERSION			:= 0
-MINOR			:= 0.0
+VERSION			:= 1
+MINOR			:= 1.1
 SONAME			:= $(PROG_NAME).$(VERSION)
-FILENAME		:= $(SONAME).$(MINOR)
+REALNAME		:= $(SONAME).$(MINOR)
 CFLAGS	 		= -g -Wall $(DEFS) $(INC)
 DEFS			= -std=c++17 -march=x86-64 -fPIC
 INC				= -iquote $(incdir)
@@ -30,7 +30,7 @@ LDFLAGS			= -shared -Wl,-soname,$(SONAME)
 prefix 			= /usr/local/
 bindir 			= $(prefix)bin/
 libdir			= $(prefix)lib/
-infodir 		= $(prefix)info/
+includedir		= $(prefix)include/
 
 ################################
 # Project files
@@ -90,7 +90,7 @@ build: $(BUILD)
 $(BUILD): $(OBJS)
 	@echo
 	@echo [LINK]
-	$(CXX) $(LDFLAGS) $^ -o $(builddir)$(FILENAME)
+	$(CXX) $(LDFLAGS) $^ -o $(builddir)$(REALNAME)
 	@touch $@
 
 $(objdir)%.o : %.cpp %.dep
@@ -111,9 +111,11 @@ $(depdir)%.dep : %.cpp | $(dirs)
 install: all
 	@echo
 	@echo [INSTALL]
-	$(INSTALLDATA) $(builddir)$(FILENAME) $(libdir)$(FILENAME)
+	$(INSTALLDATA) $(builddir)$(REALNAME) $(libdir)$(REALNAME)
+	mkdir -p $(includedir)brb2
+	$(INSTALLDATA) $(incdir)brb2.h $(includedir)brb2
 	rm -f $(libdir)$(PROG_NAME)
-	ln -s $(FILENAME) $(libdir)$(PROG_NAME)
+	ln -s $(REALNAME) $(libdir)$(PROG_NAME)
 	ldconfig
 
 clean:
@@ -124,7 +126,7 @@ endif
 	rm -f $(OBJS) $(DEPENDENCY) $(GCH) $(BUILD)
 
 realclean: clean
-	rm -f $(libdir)$(FILENAME)
+	rm -f $(libdir)$(REALNAME)
 	rm -f $(libdir)$(SONAME)
 	rm -f $(libdir)$(PROG_NAME)
 	ldconfig
