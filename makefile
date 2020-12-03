@@ -17,12 +17,7 @@ LD				:= ld
 INSTALL			:= install
 INSTALLDATA		:= install -m 644
 OS				:= linux
-PROG_NAME 		:= libbrb2.so
-VERSION			= $(lastword 0 $(shell grep "\#define BRB2_MAJOR_VERSION" $(incdir)brb2.h))
-MINOR			= $(lastword 0 $(shell grep "\#define BRB2_MINOR_VERSION" $(incdir)brb2.h))
-PATCH			= $(lastword 0 $(shell grep "\#define BRB2_PATCH_VERSION" $(incdir)brb2.h))
-SONAME			= $(PROG_NAME).$(VERSION)
-REALNAME		= $(SONAME).$(MINOR).$(PATCH)
+
 CFLAGS	 		= -g -Wall $(DEFS) $(INC)
 DEFS			= -std=c++17 -march=x86-64 -fPIC
 INC				= -iquote $(incdir)
@@ -36,6 +31,13 @@ includedir		= $(prefix)include/
 ################################
 # Project files
 ################################
+PROG_NAME 		= libbrb2.so
+VERSION			= $(lastword 0 $(shell grep "\#define BRB2_MAJOR_VERSION" $(incdir)brb2.h))
+MINOR			= $(lastword 0 $(shell grep "\#define BRB2_MINOR_VERSION" $(incdir)brb2.h))
+PATCH			= $(lastword 0 $(shell grep "\#define BRB2_PATCH_VERSION" $(incdir)brb2.h))
+SONAME			= $(PROG_NAME).$(VERSION)
+REALNAME		= $(SONAME).$(MINOR).$(PATCH)
+
 builddir 		= ./bin/$(OS)/
 incdir			= ./inc/
 src_basedir		= ./src/
@@ -45,7 +47,7 @@ resdir			= ./res/
 depdir			= ./dep/$(OS)/
 objdir			= ./obj/$(OS)/
 
-dirs		= $(builddir) $(incdir) $(src_basedir) $(resdir) \
+dirs			= $(builddir) $(incdir) $(src_basedir) $(resdir) \
 				$(3libdir) $(depdir) $(objdir)
 
 SRCS	:= $(patsubst ./%,%,$(foreach dir, $(srcdirs),$(wildcard $(dir)*.cpp)))
