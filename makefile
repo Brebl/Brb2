@@ -82,24 +82,25 @@ all: $(GCH) build
 
 # GNU specific precompiled header: 
 $(GCH): $(PCH)
-	@echo
 	@echo [PRECOMPILED HEADER]
 	$(CXX) -c $(CFLAGS) $<
+	@echo
 
 build: $(BUILD)
-	@echo
 	@echo [PROJECT UP-TO-DATE]
+	@echo
 
 $(BUILD): $(OBJS)
-	@echo
 	@echo [LINK]
 	$(CXX) $(LDFLAGS) $^ -o $(builddir)$(REALNAME)
 	@touch $@
+	@echo
 
 $(objdir)%.o : %.cpp %.dep
 	@echo [COMPILE]
 	$(CXX) -c $(CFLAGS) \
 	-o $@ $<
+	@echo
 
 # Dependency generation:
 # dep/main.dep: src/main.cpp inc/header.h
@@ -108,11 +109,11 @@ $(depdir)%.dep : %.cpp | $(dirs)
 	$(CXX) -c $(CFLAGS) \
 	-MM -MP -MT $@ $< \
 	> $@
+	@echo
 
 -include $(DEPENDENCY)
 
 install: all
-	@echo
 	@echo [INSTALL]
 	$(INSTALLDATA) $(builddir)$(REALNAME) $(libdir)$(REALNAME)
 	mkdir -p $(includedir)brb2
@@ -120,6 +121,7 @@ install: all
 	rm -f $(libdir)$(PROG_NAME)
 	ln -s $(REALNAME) $(libdir)$(PROG_NAME)
 	ldconfig
+	@echo
 
 clean:
 	@echo [CLEAN]
@@ -127,28 +129,31 @@ ifdef builddir
 	rm -f $(builddir)*
 endif
 	rm -f $(OBJS) $(DEPENDENCY) $(GCH) $(BUILD)
+	@echo
 
 realclean: clean
 	rm -f $(libdir)$(REALNAME)
 	rm -f $(libdir)$(SONAME)
 	rm -f $(libdir)$(PROG_NAME)
 	ldconfig
+	@echo
 
 rebuild: clean
-	@echo
 	@echo [REBUILD]
 	$(MAKE)
+	@echo
 
 # Directory structure
 $(dirs):
-	@echo
 	@echo [MKDIR dirs]
 	mkdir -p $(dirs)
 	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(objdir)$(dir))
 	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(depdir)$(dir))
+	@echo
 
 installdirs:
 	@echo [INSTALLDIRS]
 	mkdir -p $(dirs)
 	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(objdir)$(dir))
 	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(depdir)$(dir))
+	@echo
