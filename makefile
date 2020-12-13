@@ -144,15 +144,8 @@ rebuild: clean
 	@echo
 
 # Directory structure
-$(dirs):
+$(dirs) installdirs:
 	@echo [MKDIR dirs]
-	mkdir -p $(dirs)
-	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(objdir)$(dir))
-	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(depdir)$(dir))
-	@echo
-
-installdirs:
-	@echo [INSTALLDIRS]
 	mkdir -p $(dirs)
 	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(objdir)$(dir))
 	mkdir -p $(foreach dir,$(patsubst ./%,%,$(srcdirs)),$(depdir)$(dir))
